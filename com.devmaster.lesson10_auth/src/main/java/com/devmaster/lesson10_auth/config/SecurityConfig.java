@@ -1,5 +1,6 @@
 package com.devmaster.lesson10_auth.config;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
@@ -47,18 +48,17 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationFailureHandler customAuthenticationFailureHandler() {
-        return new SimpleUrlAuthenticationFailureHandler(){
+        return new SimpleUrlAuthenticationFailureHandler() {
             @Override
-            public  void onAuthenticationFailure(HttpServletRequest request,
-                                                 HttpServletResponse response,
-                                                 AuthenticationException exception)
-                        throws IOException {
-                String errorMessage = "Sai ten dang nhap hoac mat khau";
-                if(exception instanceof UsernameNotFoundException){
+            public void onAuthenticationFailure(HttpServletRequest request,
+                                                HttpServletResponse response,
+                                                AuthenticationException exception)
+                    throws IOException, ServletException {
+                String errorMessage = "Invalid username or password";
+                if (exception instanceof UsernameNotFoundException) {
                     errorMessage = exception.getMessage();
                 }
-
-                request.setAttribute("loginError", errorMessage);
+                request.getSession().setAttribute("loginError", errorMessage);
                 getRedirectStrategy().sendRedirect(request, response, "/login?error");
             }
         };
